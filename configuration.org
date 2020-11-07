@@ -1,6 +1,9 @@
 #+TITLE: Emacs configuration
 #+AUTHOR: Amazigh
 
+Package management taken from the excellent munen
+https://github.com/munen/emacs.d/
+
 * Packages
 ** Package repositories
 
@@ -329,16 +332,4 @@ Custom function for buffer movement.
       (add-hook 'ruby-mode-hook 'linum-mode)
       (add-hook 'ruby-mode-hook 'company-mode)
     #+END_SRC
-* Updating README from config file
-
-  Automatically update README.org when saving configuration file
-
-  #+BEGIN_SRC emacs-lisp
-    (defun update-configuration-file()
-    "Write the changes to the configuration file and update README.org"
-    (interactive)
-    (save-buffer)
-    (write-region (point-min) (point-max) "~/.emacs.d/README.org" nil nil nil))
-  #+END_SRC
-
 
