@@ -1,0 +1,332 @@
+#+TITLE: Emacs configuration for work machine
+#+AUTHOR: Amazigh
+
+* Packages
+** Package repositories
+
+#+BEGIN_SRC emacs-lisp
+  (require 'package)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  (package-initialize)
+#+END_SRC
+
+** Packages that I use
+   #+BEGIN_SRC emacs-lisp
+     (defvar my-packages '(
+			   powerline
+			   swiper
+			   org-pomodoro
+			   org-caldav
+			   minitest
+			   magit
+			   rubocop
+			   company
+			   dumb-jump
+			   ivy
+			   projectile-rails
+			   elfeed
+			   elfeed-goodies
+			   magit
+			   swiper
+			   counsel))
+   #+END_SRC
+
+** Install the packages
+If not already installed. 
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (p my-packages)
+    (unless (package-installed-p p)
+      (package-refresh-contents t) ;; async package refresh contents
+      (package-install p))
+    (add-to-list 'package-selected-packages p))
+#+END_SRC
+
+* UI
+  Strip emacs UI to the bare bones.
+  
+  #+BEGIN_SRC emacs-lisp
+    (menu-bar-mode 0)
+    (scroll-bar-mode 0)
+    (tool-bar-mode 0)
+#+END_SRC
+
+  Load the excellent modus-vivendi theme. 
+
+  #+BEGIN_SRC emacs-lisp
+    (load-theme 'modus-vivendi t)
+  #+END_SRC
+  
+  Emacs naked at startup. 
+
+  #+BEGIN_SRC emacs-lisp 
+    (setq inhibit-startup-screen t)
+  #+END_SRC
+
+* Keybindings
+** General
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "<f1>") 'help-command) ;; the describe-function command
+  (global-set-key (kbd "M-?") 'mark-paragraph)
+  (global-set-key (kbd "C-h") 'delete-backward-char)
+  (global-set-key (kbd "M-h") 'backward-kill-word)
+  (global-set-key (kbd "M-z") 'kill-ring-save)
+  (global-set-key (kbd "\C-x\C-b") 'ibuffer)
+#+END_SRC
+
+Window buffer shrinking and expanding
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "<C-up>") 'shrink-window)
+  (global-set-key (kbd "<C-down>") 'enlarge-window)
+  (global-set-key (kbd "<C-left>") 'shrink-window-horizontally)
+  (global-set-key (kbd "<C-right>") 'enlarge-window-horizontally)
+#+END_SRC
+
+** Maps concerning the numeric keyboard
+
+   I use an Azerty keyboard. 
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-x à") 'delete-window)
+  (global-set-key (kbd "C-x &") 'delete-other-windows)
+  (global-set-key (kbd "C-x é") 'split-window-below)
+  (global-set-key (kbd "C-x \"") 'split-window-right)
+  (global-set-key (kbd "C-c C-s") 'shell)
+#+END_SRC
+
+** Buffer movement
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "\C-x\C-n") 'other-window)
+#+END_SRC
+
+Custom function for buffer movement.
+
+#+BEGIN_SRC emacs-lisp
+  (defun other-window-backward (&optional n)
+    "Move to the other window backword."
+    (interactive "p")
+    (other-window (- (or n 1))))
+
+  (global-set-key (kbd "\C-x\C-p") 'other-window-backward)
+#+END_SRC
+
+
+* Org mode
+** Misc
+   
+   Record time when a task moves to DONE state. 
+
+   #+BEGIN_SRC emacs-lisp
+     (setq org-log-done 'time)
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+     (define-key global-map "\C-cl" 'org-store-link)
+     (define-key global-map "\C-ca" 'org-agenda)
+     (define-key global-map "\C-cc" 'org-capture)
+   #+END_SRC
+
+   Start org-agenda overview on Sunday. 
+
+   #+BEGIN_SRC emacs-lisp
+     (setq org-agenda-start-on-weekday 0) 
+     (setq org-agenda-skip-scheduled-if-done t)
+     ;;(setq org-reverse-note-order t)
+   #+END_SRC
+
+** Agenda files
+   #+BEGIN_SRC emacs-lisp
+     (setq org-agenda-files (list "~/org/work.org"
+				  "~/org/projects.org"
+				  "~/org/personal.org"))
+     (setq org-agenda-start-on-weekday nil)
+     (setq org-reverse-note-order t)
+   #+END_SRC
+
+** Capture templates
+
+   #+BEGIN_SRC emacs-lisp
+     (setq org-capture-templates
+	   '(
+	     ("t" "Todo" entry (file "~/org/work.org")
+	      "* TODO %?\n  %U %i\n  %a" :prepend 1)
+
+	     ("p" "Personal" entry (file "~/org/personal.org")
+	      "* TODO %?\nEntered on %U\n  %i\n  %a" :prepend 1)
+
+	     ("b" "Bookmark" entry (file "~/org/bookmarks.org")
+	      "* %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n" :empty-lines 1)
+	     )
+	   )
+
+     (define-key global-map "\C-cc" 'org-capture)
+   #+END_SRC
+
+** org Keywords
+
+   #+BEGIN_SRC emacs-lisp
+     (setq org-todo-keywords
+	   '((sequence "TODO" "IN_PROGRESS" "|" "DONE" "CANCELLED")))
+   #+END_SRC
+
+   ;;(require 'org-tempo)
+** org-babel
+
+   Ident org-babel code with TAB key.
+
+   #+BEGIN_SRC emacs-lisp
+     (setq org-src-tab-acts-natively t)
+   #+END_SRC
+
+** Autosaving org buffers 
+   Auto-save org-buffers every 30 seconds. Ideal for synching with other devices.  
+   
+
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'auto-save-hook 'org-save-all-org-buffers)
+   #+END_SRC
+
+   Auto-reload file in buffer when modified in disk. 
+
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'org-mode (lambda () (auto-revert-mode t)))
+   #+END_SRC
+
+* News with elfeed
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-x w") 'elfeed)
+   #+END_SRC
+
+  #+BEGIN_SRC emacs-lisp
+    ;; (require 'elfeed-org)
+
+    ;; Initialize elfeed-org
+    ;; This hooks up elfeed-org to read the configuration when elfeed
+    ;; is started with =M-x elfeed=
+    ;;(elfeed-org)
+
+    ;; Optionally specify a number of files containing elfeed
+    ;; configuration. If not set then the location below is used.
+    ;; Note: The customize interface is also supported.
+    ;; (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
+  #+END_SRC
+* Default settings
+** Window resize and movement
+
+   Switch between buffers back and forth. 
+     
+   #+BEGIN_SRC emacs-lisp
+     (defun switch-back-and-forth-buffer ()
+       "Switch back and forth between buffers"
+       (interactive)
+       ;;   (switch-to-buffer (other-buffer)))
+       (switch-to-buffer (car (car (window-prev-buffers)))))
+
+     (global-set-key (kbd "C-o") 'switch-back-and-forth-buffer)
+  #+END_SRC
+
+   Switch to a specific buffer. Useful when running EXWM. 
+
+  #+BEGIN_SRC emacs-lisp
+    (defun switch-to-specific-buffer (buff buff-list)
+      "Search a particular buffer in the a buffer list and display it"
+      (if (equal buff (buffer-name (car buff-list)))
+	  ;; TODO: Should make a list, and put the buffer in the list
+	  ;;      (switch-to-buffer (buffer-name (car buff-list)))
+	  (exwm-workspace-switch-to-buffer  (buffer-name (car buff-list)))
+	(if (not (eq buff-list nil))
+	    (switch-to-specific-buffer buff (cdr buff-list))
+	  (message "Not found"))))
+
+    (defun switch-to-program (program)
+      "Switch to program"
+      (interactive)
+      (switch-to-specific-buffer program (buffer-list)))
+
+    (defun switch-to-firefox ()
+      "Switch to program"
+      (interactive)
+      (switch-to-specific-buffer '"Firefox-esr" (buffer-list)))
+
+    (global-set-key (kbd "C-s-f") 'switch-to-firefox)
+   #+END_SRC
+					     
+** Font 
+   #+BEGIN_SRC emacs-lisp
+     (set-face-attribute 'default nil :height 130)
+   #+END_SRC
+
+** Powerline
+  
+ #+BEGIN_SRC emacs-lisp
+   (require 'powerline)
+   (powerline-default-theme)
+
+
+   ;; emacs source files 
+   ;;(setq find-function-C-source-directory "~/src/emacs-26.1/src/")
+
+
+
+
+   ;; tramp: remote file access
+   (setq tramp-default-method "ssh")
+   #+END_SRC
+
+** Auto-save temporary files in /tmp
+   #+BEGIN_SRC emacs-lisp
+     (setq backup-directory-alist
+	   `((".*" . ,temporary-file-directory)))
+     (setq auto-save-file-name-transforms
+	   `((".*" ,temporary-file-directory t)))
+#+END_SRC
+
+** Reloading files when changed on disk 
+
+   Coupled with the hook added auto-save mode that saves all org buffers,
+   This is ideal when synching between multpile devices.
+
+   #+BEGIN_SRC emacs-lisp
+     (global-auto-revert-mode t)
+   #+END_SRC
+
+* Ivy
+  #+BEGIN_SRC emacs-lisp
+    (ivy-mode 1)
+    (global-set-key (kbd "C-s") 'swiper)
+    (global-set-key (kbd "M-x") 'counsel-M-x)
+    (global-set-key (kbd "M-x") 'execute-extended-command)
+    (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+					    ;(global-set-key (kbd "<f1> f") 'counsel-describe-function)
+    (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+    (global-set-key (kbd "<f1> l") 'counsel-find-library)
+    (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+    (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+  #+END_SRC
+
+* Custom-file
+
+  #+BEGIN_SRC emacs-lisp
+    (setq custom-file "~/.emacs.d/custom-settings.el")
+    (load custom-file t)
+  #+END_SRC
+
+* Programming
+** Projectile rails 
+   #+BEGIN_SRC emacs-lisp
+     (projectile-rails-global-mode)
+     (define-key projectile-rails-mode-map (kbd "C-c r") 'projectile-rails-command-map)
+   #+END_SRC
+** Ruby 
+*** Minitest
+   #+BEGIN_SRC emacs-lisp
+   (add-hook 'ruby-mode-hook 'minitest-mode)
+   #+END_SRC
+*** Hooks
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'ruby-mode-hook 'linum-mode)
+      (add-hook 'ruby-mode-hook 'company-mode)
+    #+END_SRC
