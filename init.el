@@ -8,7 +8,7 @@
   (org-babel-load-file "~/.emacs.d/private.org"))
 
 (defun load-config-wm()
-  "Load the private configuration in org-mode elisp"
+  "Load Exwm configuration in org-mode elisp"
   (org-babel-load-file "~/.emacs.d/exwm.org"))
 
 (load-config-main)

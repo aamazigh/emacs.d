@@ -23,9 +23,7 @@
 			   company
 			   dumb-jump
 			   ivy
-			   nov
 			   projectile-rails
-			   use-package
 			   elfeed
 			   elfeed-goodies
 			   magit
@@ -67,8 +65,6 @@ If not already installed.
 
 * Keybindings
 ** General
-
-Map backspace key to C-h and help key to C-?
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "<f1>") 'help-command) ;; the describe-function command
@@ -117,11 +113,6 @@ Custom function for buffer movement.
   (global-set-key (kbd "\C-x\C-p") 'other-window-backward)
 #+END_SRC
 
-** Elfeed
-
-   #+BEGIN_SRC emacs-lisp
-     (global-set-key (kbd "C-x w") 'elfeed)
-   #+END_SRC
 
 * Org mode
 ** Misc
@@ -205,6 +196,10 @@ Custom function for buffer movement.
    #+END_SRC
 
 * News with elfeed
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-x w") 'elfeed)
+   #+END_SRC
+
   #+BEGIN_SRC emacs-lisp
     ;; (require 'elfeed-org)
 
@@ -289,7 +284,7 @@ Custom function for buffer movement.
 	   `((".*" ,temporary-file-directory t)))
 #+END_SRC
 
-** Reloading files when changed on disc 
+** Reloading files when changed on disk 
 
    Coupled with the hook added auto-save mode that saves all org buffers,
    This is ideal when synching between multpile devices.
