@@ -113,7 +113,6 @@ Custom function for buffer movement.
   (global-set-key (kbd "\C-x\C-p") 'other-window-backward)
 #+END_SRC
 
-
 * Org mode
 ** Misc
    
@@ -330,3 +329,16 @@ Custom function for buffer movement.
       (add-hook 'ruby-mode-hook 'linum-mode)
       (add-hook 'ruby-mode-hook 'company-mode)
     #+END_SRC
+* Updating README.org from config file
+
+  Automatically update README.org when saving configuration file
+
+  #+BEGIN_SRC emacs-lisp
+    (defun update-configuration-file()
+    "Write the changes to the configuration file and update README.org"
+    (interactive)
+    (save-buffer)
+    (write-region (point-min) (point-max) "~/.emacs.d/README.org" nil nil nil))
+  #+END_SRC
+
+
