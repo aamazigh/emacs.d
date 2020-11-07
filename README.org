@@ -14,7 +14,6 @@
    #+BEGIN_SRC emacs-lisp
      (defvar my-packages '(
 			   powerline
-			   swiper
 			   org-pomodoro
 			   org-caldav
 			   minitest
@@ -171,9 +170,7 @@ Custom function for buffer movement.
 	   '((sequence "TODO" "IN_PROGRESS" "|" "DONE" "CANCELLED")))
    #+END_SRC
 
-   ;;(require 'org-tempo)
 ** org-babel
-
    Ident org-babel code with TAB key.
 
    #+BEGIN_SRC emacs-lisp
