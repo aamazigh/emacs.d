@@ -1,10 +1,12 @@
 #+TITLE: Emacs configuration
 #+AUTHOR: Amazigh
 
-Package management taken from the excellent munen
-https://github.com/munen/emacs.d/
 
 * Packages
+
+  Package management taken and modified from the excellent munen
+  https://github.com/munen/emacs.d/
+
 ** Package repositories
 
 #+BEGIN_SRC emacs-lisp
@@ -76,6 +78,7 @@ If not already installed.
   (global-set-key (kbd "M-h") 'backward-kill-word)
   (global-set-key (kbd "M-z") 'kill-ring-save)
   (global-set-key (kbd "\C-x\C-b") 'ibuffer)
+  (global-set-key (kbd "C-c C-s") 'shell)
 #+END_SRC
 
 Window buffer shrinking and expanding
@@ -96,7 +99,6 @@ Window buffer shrinking and expanding
   (global-set-key (kbd "C-x &") 'delete-other-windows)
   (global-set-key (kbd "C-x é") 'split-window-below)
   (global-set-key (kbd "C-x \"") 'split-window-right)
-  (global-set-key (kbd "C-c C-s") 'shell)
 #+END_SRC
 
 ** Buffer movement
@@ -333,3 +335,12 @@ Custom function for buffer movement.
       (add-hook 'ruby-mode-hook 'company-mode)
     #+END_SRC
 
+* Performance tweaks
+** point (cursor) slow movements
+   Very slow movement of the cursor. 
+
+   See: https://emacs.stackexchange.com/questions/28736/emacs-pointcursor-movement-lag
+
+   #+BEGIN_SRC emacs-lisp
+   (setq auto-window-vscroll nil)
+   #+END_SRC
