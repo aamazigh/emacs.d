@@ -1,6 +1,6 @@
 #+TITLE: Emacs configuration
 #+AUTHOR: Amazigh
-
+#+STARTUP: indent
 
 * Packages
 
@@ -9,36 +9,51 @@
 
 ** Package repositories
 
-#+BEGIN_SRC emacs-lisp
-  (require 'package)
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (package-initialize)
+#+BEGIN_SRC
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
 #+END_SRC
 
 ** Packages that I use
    #+BEGIN_SRC emacs-lisp
      (defvar my-packages '(
-			   powerline
-			   swiper
-			   org-pomodoro
-			   org-caldav
-			   minitest
-			   magit
-			   rubocop
-			   company
-			   dumb-jump
-			   ivy
-			   projectile-rails
-			   elfeed
-			   elfeed-goodies
-			   magit
-			   swiper
-			   counsel))
-   #+END_SRC
+                           ; powerline
+                           use-package
+                           swiper
+                           evil
+                           evil-collection
+                           evil-leader
+                           evil-escape
+                           ; org-pomodoro
+                           org-roam
+                           org-bullets
+                           org-caldav
+                           minitest
+                           magit
+                           rubocop
+                           company
+                           dumb-jump
+                           ivy
+                           projectile-rails
+                           elfeed
+                           elfeed-goodies
+                           magit
+                           evil
+                           lsp-mode
+                           ; meow
+                           which-key
+                           beacon
+                           visual-fill-column
+                           ;; doom-modeline requires nerd fonts which are not available as a debian package. 
+                           ; doom-modeline 
+                           emacsql
+                           embark
+                           counsel))
+#+END_SRC
 
 ** Install the packages
 If not already installed. 
-
 #+BEGIN_SRC emacs-lisp
   (dolist (p my-packages)
     (unless (package-installed-p p)
@@ -48,27 +63,67 @@ If not already installed.
 #+END_SRC
 
 * UI
-  Strip emacs UI to the bare bones.
+Strip emacs UI to the bare bones.
   
-  #+BEGIN_SRC emacs-lisp
-    (menu-bar-mode 0)
-    (scroll-bar-mode 0)
-    (tool-bar-mode 0)
+#+BEGIN_SRC emacs-lisp
+  (menu-bar-mode 0)
+  (scroll-bar-mode 0)
+  (tool-bar-mode 0)
 #+END_SRC
 
-  Load the excellent modus-vivendi theme. 
+Load the excellent modus-vivendi theme. 
 
-  #+BEGIN_SRC emacs-lisp
-    (load-theme 'modus-vivendi t)
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  ;; (load-theme 'modus-vivendi t)
+#+END_SRC
   
-  Emacs naked at startup. 
+Don't display the Emacs startup screen 
 
-  #+BEGIN_SRC emacs-lisp 
-    (setq inhibit-startup-screen t)
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp 
+  (setq inhibit-startup-screen t)
+#+END_SRC
 
-* Keybindings
+Disable blinking the cursor. Maybe it's distracting? Stressfull? 
+
+#+begin_src emacs-lisp
+  (blink-cursor-mode 0)
+#+end_src
+
+Whenever the window scrolls a light will "shine" on top of your cursor
+so you know where it is.
+
+#+begin_src emacs-lisp
+  (beacon-mode 1)
+#+end_src
+
+Center everything in the buffers
+
+#+begin_src emacs-lisp
+  ;; (setq-default visual-fill-column-center-text t) 
+  ;; (setq visual-fill-column-width 80)
+  ;; (global-visual-fill-column-mode)
+#+end_src
+
+Set visual-like-mode everywhere
+#+begin_src emacs-lisp
+  (global-visual-line-mode)
+#+end_src
+
+doom-modeline is a cool mode line, but you should install nerd-fonts for it to display the icons properly. 
+
+#+begin_src emacs-lisp
+    ;; (require 'doom-modeline)
+    ;; (doom-modeline-mode 1) 
+    ;; How wide the mode-line bar should be. It's only respected in GUI.
+    ;; (setq doom-modeline-height 40)
+#+END_src
+
+Record the point (the position of the cursor) when killing the buffer. Next time you open the file, point will be placed at the position you left it.
+
+#+begin_src emacs-lisp
+  (save-place-mode 1)
+#+end_src
+
 ** General
 
 #+BEGIN_SRC emacs-lisp
@@ -77,7 +132,8 @@ If not already installed.
   (global-set-key (kbd "C-h") 'delete-backward-char)
   (global-set-key (kbd "M-h") 'backward-kill-word)
   (global-set-key (kbd "M-z") 'kill-ring-save)
-  (global-set-key (kbd "\C-x\C-b") 'ibuffer)
+  (global-set-key (kbd "C-x b") 'ibuffer)
+  (global-set-key (kbd "\C-x\C-b") 'ivy-switch-buffer)
   (global-set-key (kbd "C-c C-s") 'shell)
 #+END_SRC
 
@@ -92,7 +148,7 @@ Window buffer shrinking and expanding
 
 ** Maps concerning the numeric keyboard
 
-   I use an Azerty keyboard. 
+I use an Azerty keyboard. 
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x à") 'delete-window)
@@ -119,28 +175,6 @@ Custom function for buffer movement.
 #+END_SRC
 
 * Org mode
-** Misc
-   
-   Record time when a task moves to DONE state. 
-
-   #+BEGIN_SRC emacs-lisp
-     (setq org-log-done 'time)
-   #+END_SRC
-
-   #+BEGIN_SRC emacs-lisp
-     (define-key global-map "\C-cl" 'org-store-link)
-     (define-key global-map "\C-ca" 'org-agenda)
-     (define-key global-map "\C-cc" 'org-capture)
-   #+END_SRC
-
-   Start org-agenda overview on Sunday. 
-
-   #+BEGIN_SRC emacs-lisp
-     (setq org-agenda-start-on-weekday 0) 
-     (setq org-agenda-skip-scheduled-if-done t)
-     ;;(setq org-reverse-note-order t)
-   #+END_SRC
-
 ** Agenda files
    #+BEGIN_SRC emacs-lisp
      (setq org-agenda-files (list "~/org/work.org"
@@ -152,14 +186,19 @@ Custom function for buffer movement.
 
 ** Capture templates
 
+My org-capture template. %-escapes allow dynamic insertion of content. 
+%? position point here
+%U inactive timestamp, date and time
+
    #+BEGIN_SRC emacs-lisp
      (setq org-capture-templates
 	   '(
 	     ("t" "Todo" entry (file "~/org/work.org")
-	      "* TODO %?\n  %U %i\n  %a" :prepend 1)
+	      "* TODO %?\nEntered on %U" :prepend 1)
 
 	     ("p" "Personal" entry (file "~/org/personal.org")
-	      "* TODO %?\nEntered on %U\n  %i\n  %a" :prepend 1)
+	      ;"* TODO %?\nEntered on %U\n" :prepend 1)
+	      "* TODO %?\nEntered on %U\n")
 
 	     ("b" "Bookmark" entry (file "~/org/bookmarks.org")
 	      "* %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n" :empty-lines 1)
@@ -173,22 +212,21 @@ Custom function for buffer movement.
 
    #+BEGIN_SRC emacs-lisp
      (setq org-todo-keywords
-	   '((sequence "TODO" "IN_PROGRESS" "|" "DONE" "CANCELLED")))
+	   '((sequence "TODO" "IN PROGRESS" "|" "DONE" "CANCELLED")))
    #+END_SRC
 
-   ;;(require 'org-tempo)
 ** org-babel
 
    Ident org-babel code with TAB key.
 
    #+BEGIN_SRC emacs-lisp
-     (setq org-src-tab-acts-natively t)
+     ; (setq org-src-tab-acts-natively t)
    #+END_SRC
 
 ** Autosaving org buffers 
+
    Auto-save org-buffers every 30 seconds. Ideal for synching with other devices.  
    
-
    #+BEGIN_SRC emacs-lisp
      (add-hook 'auto-save-hook 'org-save-all-org-buffers)
    #+END_SRC
@@ -198,7 +236,85 @@ Custom function for buffer movement.
    #+BEGIN_SRC emacs-lisp
      (add-hook 'org-mode (lambda () (auto-revert-mode t)))
    #+END_SRC
+   
+** Misc
 
+Bullets in org-mode are nice
+#+BEGIN_SRC emacs-lisp
+  (require 'org-bullets)
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+#+END_SRC
+
+Record time when a task moves to DONE state. 
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-log-done 'time)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (define-key global-map "\C-cl" 'org-store-link)
+  (define-key global-map "\C-ca" 'org-agenda)
+  (define-key global-map "\C-cc" 'org-capture)
+#+END_SRC
+
+Start org-agenda overview on Sunday. 
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-start-on-weekday 1) 
+  (setq org-agenda-skip-scheduled-if-done t)
+  ;;(setq org-reverse-note-order t)
+#+END_SRC
+
+When you trigger org capture, directly go to evil insert mode
+#+begin_src emacs-lisp
+  (add-hook 'org-capture-mode-hook 'evil-insert-state)
+#+end_src
+
+Automatically indent org-mode files
+#+begin_src emacs-lisp
+  (setq org-startup-indented t)
+#+end_src
+* Org-roam
+
+Where the org-roam files are stored.
+
+  #+BEGIN_SRC emacs-lisp
+    (setq org-roam-directory "~/org-roam")
+    (org-roam-db-autosync-mode)
+  #+END_SRC
+
+  Let's journal with org-roam dailies
+
+  #+begin_src emacs-lisp
+    (setq org-roam-dailies-directory "journal/")
+    
+    (setq org-roam-dailies-capture-templates
+          '(("d" "default" entry
+             "* %?"
+             :target (file+head "%<%Y-%m-%d>.org"
+                                "#+title: %<%Y-%m-%d>\n"))))
+
+  #+end_src
+
+  Global keyboard shortcuts to insert org-roam node
+  #+begin_src emacs-lisp
+    (global-set-key (kbd "C-c n I") 'org-roam-node-insert)
+    (global-set-key (kbd "C-c n i") 'org-roam-node-insert-immediate)
+    (global-set-key (kbd "C-c n l") 'org-roam-buffer-toggle)
+  #+end_src
+
+  Taken from the website: https://systemcrafters.net/build-a-second-brain-in-emacs/5-org-roam-hacks/
+
+#+begin_src emacs-lisp
+  ;; Bind this to C-c n I
+  (defun org-roam-node-insert-immediate (arg &rest args)
+    (interactive "P")
+    (let ((args (cons arg args))
+          (org-roam-capture-templates (list (append (car org-roam-capture-templates)
+                                                    '(:immediate-finish t)))))
+      (apply #'org-roam-node-insert args)))
+#+end_src
+  
 * News with elfeed
    #+BEGIN_SRC emacs-lisp
      (global-set-key (kbd "C-x w") 'elfeed)
@@ -220,62 +336,66 @@ Custom function for buffer movement.
 * Default settings
 ** Window resize and movement
 
-   Switch between buffers back and forth. 
+Switch between buffers back and forth. 
      
-   #+BEGIN_SRC emacs-lisp
-     (defun switch-back-and-forth-buffer ()
-       "Switch back and forth between buffers"
-       (interactive)
-       ;;   (switch-to-buffer (other-buffer)))
-       (switch-to-buffer (car (car (window-prev-buffers)))))
+#+BEGIN_SRC emacs-lisp
+  (defun switch-back-and-forth-buffer ()
+    "Switch back and forth between buffers"
+    (interactive)
+    ;;   (switch-to-buffer (other-buffer)))
+    (switch-to-buffer (car (car (window-prev-buffers)))))
 
-     (global-set-key (kbd "C-o") 'switch-back-and-forth-buffer)
-  #+END_SRC
+  (global-set-key (kbd "C-o") 'switch-back-and-forth-buffer)
+#+END_SRC
 
-   Switch to a specific buffer. Useful when running EXWM. 
+Switch to a specific buffer. Useful when running EXWM. 
 
-  #+BEGIN_SRC emacs-lisp
-    (defun switch-to-specific-buffer (buff buff-list)
-      "Search a particular buffer in the a buffer list and display it"
-      (if (equal buff (buffer-name (car buff-list)))
-	  ;; TODO: Should make a list, and put the buffer in the list
-	  ;;      (switch-to-buffer (buffer-name (car buff-list)))
-	  (exwm-workspace-switch-to-buffer  (buffer-name (car buff-list)))
-	(if (not (eq buff-list nil))
-	    (switch-to-specific-buffer buff (cdr buff-list))
-	  (message "Not found"))))
+#+BEGIN_SRC emacs-lisp
+  (defun switch-to-specific-buffer (buff buff-list)
+    "Search a particular buffer in the a buffer list and display it"
+    (if (equal buff (buffer-name (car buff-list)))
+        ;; TODO: Should make a list, and put the buffer in the list
+        ;;      (switch-to-buffer (buffer-name (car buff-list)))
+        (exwm-workspace-switch-to-buffer  (buffer-name (car buff-list)))
+      (if (not (eq buff-list nil))
+          (switch-to-specific-buffer buff (cdr buff-list))
+        (message "Not found"))))
 
-    (defun switch-to-program (program)
-      "Switch to program"
-      (interactive)
-      (switch-to-specific-buffer program (buffer-list)))
+  (defun switch-to-program (program)
+    "Switch to program"
+    (interactive)
+    (switch-to-specific-buffer program (buffer-list)))
 
-    (defun switch-to-firefox ()
-      "Switch to program"
-      (interactive)
-      (switch-to-specific-buffer '"Firefox-esr" (buffer-list)))
+  (defun switch-to-firefox ()
+    "Switch to program"
+    (interactive)
+    (switch-to-specific-buffer '"Firefox-esr" (buffer-list)))
 
-    (global-set-key (kbd "C-s-f") 'switch-to-firefox)
-   #+END_SRC
+  (global-set-key (kbd "C-s-f") 'switch-to-firefox)
+#+END_SRC
 					     
 ** Font 
+
+The font Iosevka Comfy should be installed on the host OS first. 
    #+BEGIN_SRC emacs-lisp
-     (set-face-attribute 'default nil :height 130)
+;;      (set-face-attribute 'default nil :height 130)
+     ;; (set-face-attribute 'default nil :font "Inconsolata-17") 
+;;     (set-face-attribute 'default nil :font "Iosevka Comfy" :height 160) 
+     (set-face-attribute 'default nil :font "JetBrains Mono" :height 160) 
    #+END_SRC
+
+ When launching the emacs daemon, the client does not load the font specified here. Workaround found here: https://stackoverflow.com/questions/3984730/emacs-gui-with-emacs-daemon-not-loading-fonts-correctly
+ #+begin_src emacs-lisp
+    (setq default-frame-alist '((font . "JetBrains Mono-16")))
+ #+end_src
 
 ** Powerline
   
  #+BEGIN_SRC emacs-lisp
-   (require 'powerline)
-   (powerline-default-theme)
-
-
+   ;;(require 'powerline)
+   ;;(powerline-default-theme)
    ;; emacs source files 
    ;;(setq find-function-C-source-directory "~/src/emacs-26.1/src/")
-
-
-
-
    ;; tramp: remote file access
    (setq tramp-default-method "ssh")
    #+END_SRC
@@ -296,7 +416,7 @@ Custom function for buffer movement.
    #+BEGIN_SRC emacs-lisp
      (global-auto-revert-mode t)
    #+END_SRC
-
+   
 * Ivy
   #+BEGIN_SRC emacs-lisp
     (ivy-mode 1)
@@ -304,7 +424,7 @@ Custom function for buffer movement.
     (global-set-key (kbd "M-x") 'counsel-M-x)
     (global-set-key (kbd "M-x") 'execute-extended-command)
     (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-					    ;(global-set-key (kbd "<f1> f") 'counsel-describe-function)
+    (global-set-key (kbd "<f1> f") 'counsel-describe-function)
     (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
     (global-set-key (kbd "<f1> l") 'counsel-find-library)
     (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
@@ -320,7 +440,7 @@ Custom function for buffer movement.
 
 * Programming
 ** Projectile rails 
-   #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lis
      (projectile-rails-global-mode)
      (define-key projectile-rails-mode-map (kbd "C-c r") 'projectile-rails-command-map)
    #+END_SRC
@@ -334,13 +454,247 @@ Custom function for buffer movement.
       (add-hook 'ruby-mode-hook 'linum-mode)
       (add-hook 'ruby-mode-hook 'company-mode)
     #+END_SRC
-
+** Elixir
+#+begin_src emacs-lisp
+   (use-package lsp-mode
+    :commands lsp
+    :ensure t
+    :diminish lsp-mode
+    :hook
+    (elixir-mode . lsp)
+    :init
+    (add-to-list 'exec-path "/run/current-system/sw/bin/elixir")) 
+#+end_src
 * Performance tweaks
 ** point (cursor) slow movements
    Very slow movement of the cursor. 
-
    See: https://emacs.stackexchange.com/questions/28736/emacs-pointcursor-movement-lag
 
    #+BEGIN_SRC emacs-lisp
    (setq auto-window-vscroll nil)
    #+END_SRC
+
+* Marginalia
+#+begin_src emacs-lisp
+  (use-package marginalia
+    :ensure t
+    :init
+    (marginalia-mode))
+#+end_src
+
+* Tree-sitter
+#+begin_src emacs-lisp
+  ;; (require 'tree-sitter)
+#+end_src
+* Meow mode (modal editing)
+
+I am not using it anymore. 
+ #+BEGIN_SRC emacs-lisp
+   ;; (defun meow-setup ()
+   ;;   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+   ;;   (meow-motion-overwrite-define-key
+   ;;    '("j" . meow-next)
+   ;;    '("k" . meow-prev)
+   ;;    '("<escape>" . ignore))
+   ;;   (meow-leader-define-key
+   ;;    ;; SPC j/k will run the original command in MOTION state.
+   ;;    '("j" . "H-j")
+   ;;    '("k" . "H-k")
+   ;;    ;; Use SPC (0-9) for digit arguments.
+   ;;    '("1" . meow-digit-argument)
+   ;;    '("2" . meow-digit-argument)
+   ;;    '("3" . meow-digit-argument)
+   ;;    '("4" . meow-digit-argument)
+
+   ;;  '("5" . meow-digit-argument)
+   ;;  '("6" . meow-digit-argument)
+   ;;  '("7" . meow-digit-argument)
+   ;;  '("8" . meow-digit-argument)
+   ;;  '("9" . meow-digit-argument)
+   ;;  '("0" . meow-digit-argument)
+   ;;  '("o" . switch-back-and-forth-buffer)
+   ;;  '("j" . avy-goto-word-or-subword-1)
+   ;;  '("/" . meow-keypad-describe-key)
+   ;;  '("?" . meow-cheatsheet)
+
+   ;;  )
+   ;; (meow-normal-define-key
+   ;;  '("0" . meow-expand-0)
+   ;;  '("9" . meow-expand-9)
+   ;;  '("8" . meow-expand-8)
+   ;;  '("7" . meow-expand-7)
+   ;;  '("6" . meow-expand-6)
+   ;;  '("5" . meow-expand-5)
+   ;;  '("4" . meow-expand-4)
+   ;;  '("3" . meow-expand-3)
+   ;;  '("2" . meow-expand-2)
+   ;;  '("1" . meow-expand-1)
+   ;;  '("-" . negative-argument)
+   ;;  '(";" . meow-reverse)
+   ;;  '("," . meow-inner-of-thing)
+   ;;  '("." . meow-bounds-of-thing)
+   ;;  '("[" . meow-beginning-of-thing)
+   ;;  '("]" . meow-end-of-thing)
+   ;;  '("a" . meow-append)
+   ;;  '("A" . meow-open-below)
+   ;;  '("b" . meow-back-word)
+   ;;  '("B" . meow-back-symbol)
+   ;;  '("c" . meow-change)
+   ;;  '("d" . meow-delete)
+   ;;  '("D" . meow-backward-delete)
+   ;;  '("e" . meow-next-word)
+   ;;  '("E" . meow-next-symbol)
+   ;;  '("f" . meow-find)
+   ;;  '("g" . meow-cancel-selection)
+   ;;  '("G" . meow-grab)
+   ;;  '("h" . meow-left)
+   ;;  '("H" . meow-left-expand)
+   ;;  '("i" . meow-insert)
+   ;;  '("I" . meow-open-above)
+   ;;  '("j" . meow-next)
+   ;;  '("J" . meow-next-expand)
+   ;;  '("k" . meow-prev)
+   ;;  '("K" . meow-prev-expand)
+   ;;  '("l" . meow-right)
+   ;;  '("L" . meow-right-expand)
+   ;;  '("m" . meow-join)
+   ;;  '("n" . meow-search)
+   ;;  '("o" . meow-block)
+   ;;  '("O" . meow-to-block)
+   ;;  '("p" . meow-yank)
+   ;;  '("q" . meow-quit)
+   ;;  '("Q" . meow-goto-line)
+   ;;  '("r" . meow-replace)
+   ;;  '("R" . meow-swap-grab)
+   ;;  '("s" . meow-kill)
+   ;;  '("t" . meow-till)
+   ;;  '("u" . meow-undo)
+   ;;  '("U" . meow-undo-in-selection)
+   ;;  '("v" . meow-visit)
+   ;;  '("w" . meow-mark-word)
+   ;;  '("W" . meow-mark-symbol)
+   ;;  '("x" . meow-line)
+   ;;  '("X" . meow-goto-line)
+   ;;  '("y" . meow-save)
+   ;;  '("Y" . meow-sync-grab)
+   ;;  '("z" . meow-pop-selection)
+   ;;  '("'" . repeat)
+   ;;  '("<escape>" . ignore)))
+ #+END_SRC
+
+ #+BEGIN_SRC emacs-lisp
+;;   (require 'meow)
+;;   (meow-setup)
+;;   (meow-global-mode 1)
+ #+end_src
+ 
+* Evil mode
+** Before loading evil 
+
+In visual-mode, movements between lines are at the logical level, not the visual level. I.e., lines are considered logically, not visually, that is, if a visual line spanes three lines on the screen, you cannot navigate line by line with the normal evil movements "jklm". 
+The solution is provided by evil; the documentation: https://evil.readthedocs.io/en/latest/settings.html#elispobj-evil-respect-visual-line-mode
+
+The documentation says that the variable should be set before evil is loaded. So here it is: 
+
+#+begin_src emacs-lisp
+  (setq evil-respect-visual-line-mode t) 
+#+end_src
+
+
+#+BEGIN_SRC emacs-lisp
+  ;; (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+  (setq evil-want-keybinding nil)
+#+END_SRC
+
+** Load evil mode
+
+Enable evil mode first
+
+#+BEGIN_SRC emacs-lisp
+      (require 'evil)
+      (evil-mode 1)
+#+END_SRC
+
+** Evil collection 
+
+I could only make evil-collection work with use-package, no idea why that is.
+
+#+begin_src emacs-lisp
+  (use-package evil-collection
+    :custom (evil-collection-setup-minibuffer t)
+    :init (evil-collection-init))
+#+end_src
+
+** Evil leader
+#+BEGIN_SRC emacs-lisp
+  (global-evil-leader-mode)
+  (evil-leader/set-leader "<SPC>")
+  (evil-leader/set-key
+    "f" 'find-file
+    "b" 'switch-to-buffer
+    ;; "k" 'kill-this-buffer
+    "k" 'kill-buffer
+    "o" 'switch-back-and-forth-buffer
+    ;;"j" 'avy-goto-word-or-subword-1
+    "j" 'avy-goto-char-timer
+    "à" 'delete-window
+    "&" 'delete-other-windows
+    "é" 'split-window-below
+    "\"" 'split-window-right
+    "n" 'other-window
+    "p" 'other-window-backward
+    "c ," 'org-insert-structure-template
+    "c c" 'org-capture
+    "a" 'org-agenda
+    "r c" 'org-roam-capture 
+    "r f" 'org-roam-node-find
+    "r p" 'org-roam-node-insert
+    "c n i" 'org-roam-node-insert
+    "r j t" 'org-roam-dailies-goto-today
+    "x b" 'ibuffer
+    "x e" 'eval-last-sexp
+    "c x a" 'org-archive-subtree-default
+    "c t" 'org-todo
+    ;"c c" 'org-capture-finalize
+    "c x a" 'org-archive-subtree-default 
+    "c n l" 'org-roam-buffer-toggle
+    "c o" 'org-open-at-point
+    "s" 'swiper
+    "x n s" 'org-narrow-to-subtree
+    "x n w" 'widen
+    ;"c p" 'org-previous-visible-heading
+    ;"c n" 'org-next-visible-heading
+  )
+
+#+END_SRC
+
+Set the delay of avy-goto-char
+#+begin_src emacs-lisp
+  (setq avy-timeout-seconds 0.3)
+#+end_src
+
+** Evil escape
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default evil-escape-key-sequence "jk")
+  (setq-default evil-escape-delay 0.15)
+  (evil-escape-mode)
+#+END_SRC
+
+** Misc
+
+Use the tab key for visibility cycling in Org and Evil mode
+Taken from: https://jeffkreeftmeijer.com/emacs-evil-org-tab/
+#+begin_src emacs-lisp
+  (setq evil-want-C-i-jump nil)
+#+end_src
+
+** Enable undo-redo
+#+begin_src emacs-lisp
+  (evil-set-undo-system 'undo-redo)
+#+end_src
+* Which key
+#+BEGIN_SRC emacs-lisp
+  (require 'which-key)
+  (which-key-mode)
+#+END_SRC
